@@ -225,11 +225,6 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => {
         if (response.ok) {
             contactForm.reset();
-            document.getElementById('thank-you-popup').style.display = 'flex';
-        } else {
-            alert(" Thank you for reaching out! I’ll respond as soon as possible.");
-            contactForm.reset();
-        }
     })
     .catch(() => {
         alert(" Unable to send message. Check your internet or try again.");
@@ -237,14 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     });
 
-    const closePopupBtn = document.getElementById('close-popup');
-    if (closePopupBtn) {
-        closePopupBtn.addEventListener('click', function() {
-            document.getElementById('thank-you-popup').style.display = 'none';
-                });
-            }
-
-    // Add scroll effect to header
+     // Add scroll effect to header
     let lastScrollTop = 0;
     const header = document.querySelector('header');
     
