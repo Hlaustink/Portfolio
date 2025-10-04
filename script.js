@@ -31,23 +31,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Mobile Navigation Toggle
-    const navToggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    
-    navToggle.addEventListener('click', function() {
-        navLinks.classList.toggle('active');
-        
-        // Change hamburger to X when menu is open
-        const icon = this.querySelector('i');
-        if (navLinks.classList.contains('active')) {
-            icon.classList.remove('fa-bars');
-            icon.classList.add('fa-times');
-        } else {
-            icon.classList.remove('fa-times');
-            icon.classList.add('fa-bars');
-        }
-    });
+// Navigation toggle for mobile
+const navToggle = document.querySelector('.nav-toggle');
+const navLinks = document.querySelector('.nav-links');
+
+navToggle.addEventListener('click', () => {
+  navLinks.classList.toggle('active');
+});
+
+// Theme toggle
+const themeToggle = document.querySelector('.theme-toggle');
+const body = document.body;
+
+// Load saved theme from localStorage
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  body.classList.add('dark-mode');
+  themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+} else {
+  themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+}
+
+themeToggle.addEventListener('click', () => {
+  body.classList.toggle('dark-mode');
+  const isDarkMode = body.classList.contains('dark-mode');
+
+  // Swap the icon
+  themeToggle.innerHTML = isDarkMode
+    ? '<i class="fas fa-sun"></i>'
+    : '<i class="fas fa-moon"></i>';
+
+  // Save preference
+  localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+});
+
     
     // Close mobile menu when clicking on a link
     document.querySelectorAll('.nav-links a').forEach(link => {
