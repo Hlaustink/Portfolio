@@ -180,40 +180,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         input.style.borderColor = '';
     }
-    
-    // Add loading state to form submission
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const name = document.getElementById('name');
-    const email = document.getElementById('email');
-    const message = document.getElementById('message');
-
-    let isValid = true;
-
-    if (!name.value.trim()) {
-        showError(name, 'Name is required');
-        isValid = false;
-    } else {
-        clearError(name);
-    }
-
-    if (!email.value.trim() || !isValidEmail(email.value)) {
-        showError(email, 'Valid email is required');
-        isValid = false;
-    } else {
-        clearError(email);
-    }
-
-    if (!message.value.trim()) {
-        showError(message, 'Message is required');
-        isValid = false;
-    } else {
-        clearError(message);
-    }
-
-    if (!isValid) return;
 
     // Send data to Formspree
     const formData = new FormData(contactForm);
@@ -225,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => {
         if (response.ok) {
             contactForm.reset();
-    })
+        }})
     .catch(() => {
         alert(" Unable to send message. Check your internet or try again.");
         contactForm.reset();
