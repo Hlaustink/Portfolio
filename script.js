@@ -1,83 +1,55 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Theme Toggle
     const themeToggle = document.querySelector('.theme-toggle');
     const themeIcon = themeToggle.querySelector('i');
+    const body = document.body;
 
-    const currentTheme = localStorage.getItem('theme') || 'dark';
-    
-    if (currentTheme === 'dark') {
-        document.body.classList.add('dark-mode');
+    // Load saved theme from localStorage
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
         themeIcon.classList.remove('fa-moon');
         themeIcon.classList.add('fa-sun');
+    } else {
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
     }
-    else {
-    document.body.classList.remove('dark-mode');
-    themeIcon.classList.remove('fa-sun');
-    themeIcon.classList.add('fa-moon');
-}
 
-    
-    themeToggle.addEventListener('click', function() {
-        document.body.classList.toggle('dark-mode');
-        
-        if (document.body.classList.contains('dark-mode')) {
-            localStorage.setItem('theme', 'dark');
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
-        } else {
-            localStorage.setItem('theme', 'light');
-            themeIcon.classList.remove('fa-sun');
-            themeIcon.classList.add('fa-moon');
-        }
+    // Theme toggle click
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        const isDarkMode = body.classList.contains('dark-mode');
+
+        // Swap the icon
+        themeIcon.classList.toggle('fa-sun', isDarkMode);
+        themeIcon.classList.toggle('fa-moon', !isDarkMode);
+
+        // Save preference
+        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
     });
-    
-// Navigation toggle for mobile
-const navToggle = document.querySelector('.nav-toggle');
-const navLinks = document.querySelector('.nav-links');
 
-navToggle.addEventListener('click', () => {
-  navLinks.classList.toggle('active');
-});
+    // --- Rest of your original code remains unchanged below ---
 
-// Theme toggle
-const themeToggle = document.querySelector('.theme-toggle');
-const body = document.body;
+    // Navigation toggle for mobile
+    const navToggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
 
-// Load saved theme from localStorage
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'dark') {
-  body.classList.add('dark-mode');
-  themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-} else {
-  themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-}
+    navToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+    });
 
-themeToggle.addEventListener('click', () => {
-  body.classList.toggle('dark-mode');
-  const isDarkMode = body.classList.contains('dark-mode');
-
-  // Swap the icon
-  themeToggle.innerHTML = isDarkMode
-    ? '<i class="fas fa-sun"></i>'
-    : '<i class="fas fa-moon"></i>';
-
-  // Save preference
-  localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-});
-
-    
     // Close mobile menu when clicking on a link
     document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function () {
             navLinks.classList.remove('active');
             const navToggleIcon = navToggle.querySelector('i');
             navToggleIcon.classList.remove('fa-times');
             navToggleIcon.classList.add('fa-bars');
         });
     });
-    
+
     // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         const isClickInsideNav = navLinks.contains(event.target) || navToggle.contains(event.target);
         if (!isClickInsideNav && navLinks.classList.contains('active')) {
             navLinks.classList.remove('active');
@@ -86,20 +58,20 @@ themeToggle.addEventListener('click', () => {
             navToggleIcon.classList.add('fa-bars');
         }
     });
-    
+
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
+        anchor.addEventListener('click', function (e) {
             // Skip if it's the theme toggle or nav toggle
             if (this.classList.contains('theme-toggle') || this.classList.contains('nav-toggle')) {
                 return;
             }
-            
+
             e.preventDefault();
-            
+
             const targetId = this.getAttribute('href');
             if (targetId === '#') return;
-            
+
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
                 window.scrollTo({
@@ -109,119 +81,122 @@ themeToggle.addEventListener('click', () => {
             }
         });
     });
-    
+
     // Add subtle animation to buttons on hover
     const buttons = document.querySelectorAll('.cv-button, .view-more-projects, .contact-form button');
-    
+
     buttons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
+        button.addEventListener('mouseenter', function () {
             this.style.transform = 'translateY(-2px)';
         });
-        
-        button.addEventListener('mouseleave', function() {
+
+        button.addEventListener('mouseleave', function () {
             this.style.transform = 'translateY(0)';
         });
     });
-    
+
     // Form submission handling
     const contactForm = document.querySelector('.contact-form');
     if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
+        contactForm.addEventListener('submit', function (e) {
             // Basic form validation
             const name = document.getElementById('name');
             const email = document.getElementById('email');
             const message = document.getElementById('message');
-            
+
             let isValid = true;
-            
+
             if (!name.value.trim()) {
                 showError(name, 'Name is required');
                 isValid = false;
             } else {
                 clearError(name);
             }
-            
+
             if (!email.value.trim() || !isValidEmail(email.value)) {
                 showError(email, 'Valid email is required');
                 isValid = false;
             } else {
                 clearError(email);
             }
-            
+
             if (!message.value.trim()) {
                 showError(message, 'Message is required');
                 isValid = false;
             } else {
                 clearError(message);
             }
-            
+
             if (!isValid) {
                 e.preventDefault();
+                return;
             }
+
+            // Submit via fetch
+            e.preventDefault();
+            const formData = new FormData(contactForm);
+            fetch(contactForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        contactForm.reset();
+                        alert("Message sent successfully!");
+                    }
+                })
+                .catch(() => {
+                    alert("Unable to send message. Check your internet or try again.");
+                    contactForm.reset();
+                });
         });
     }
-    
+
     // Email validation function
     function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
-    
+
     // Show error function
     function showError(input, message) {
         const formGroup = input.parentElement;
         let errorElement = formGroup.querySelector('.error-message');
-        
+
         if (!errorElement) {
             errorElement = document.createElement('div');
             errorElement.className = 'error-message';
             formGroup.appendChild(errorElement);
         }
-        
+
         errorElement.textContent = message;
         errorElement.style.color = '#e74c3c';
         errorElement.style.fontSize = '0.9rem';
         errorElement.style.marginTop = '0.3rem';
-        
+
         input.style.borderColor = '#e74c3c';
     }
-    
+
     // Clear error function
     function clearError(input) {
         const formGroup = input.parentElement;
         const errorElement = formGroup.querySelector('.error-message');
-        
+
         if (errorElement) {
             errorElement.remove();
         }
-        
+
         input.style.borderColor = '';
     }
 
-    // Send data to Formspree
-    const formData = new FormData(contactForm);
-    fetch(contactForm.action, {
-    method: 'POST',
-    body: formData,
-    headers: { 'Accept': 'application/json' }
-    })
-    .then(response => {
-        if (response.ok) {
-            contactForm.reset();
-        }})
-    .catch(() => {
-        alert(" Unable to send message. Check your internet or try again.");
-        contactForm.reset();
-    });
-    });
-
-     // Add scroll effect to header
+    // Add scroll effect to header
     let lastScrollTop = 0;
     const header = document.querySelector('header');
-    
-    window.addEventListener('scroll', function() {
+
+    window.addEventListener('scroll', function () {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
+
         if (scrollTop > lastScrollTop && scrollTop > 100) {
             // Scrolling down
             header.style.transform = 'translateY(-100%)';
@@ -229,13 +204,13 @@ themeToggle.addEventListener('click', () => {
             // Scrolling up
             header.style.transform = 'translateY(0)';
         }
-        
+
         lastScrollTop = scrollTop;
     });
-    
+
     // Add fade-in animation to sections as they come into view
     const sections = document.querySelectorAll('section');
-    
+
     const sectionObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -244,11 +219,11 @@ themeToggle.addEventListener('click', () => {
             }
         });
     }, { threshold: 0.1 });
-    
+
     sections.forEach(section => {
         section.style.opacity = '0';
         section.style.transform = 'translateY(20px)';
         section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         sectionObserver.observe(section);
     });
-}});
+});
